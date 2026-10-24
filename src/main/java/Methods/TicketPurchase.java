@@ -28,7 +28,16 @@ public class TicketPurchase extends BrowserDriver {
     By continueBtn = By.xpath("//*[@id='ssd365105055']/div/div[3]/div/div[2]");
     By donationBox = By.xpath("//label[contains(@class,'cff-checkbox-style')]");
     By donation10 = By.xpath("//*[@id='opt_amount']/table[2]/tbody/tr/td[1]/label");
-    By addtoOrder = By.xpath("//*[@id='add_donation_cntonsel']/div[3]/div");
+    By donation15 = By.xpath("//label[@class='cff-radio-style' and @for='opt_amount_15']");
+    By donationCustom = By.xpath("/html/body/div[6]/div/div[2]/div/div/div/div/div/div/div[2]/form/div[2]/div/div/div/div/div/div/table/tbody/tr/td[2]/div/table[4]/tbody/tr/td[1]/label");
+    By donationAmt = By.xpath("//*[@id='amount']");
+
+    By addtoOrder = By.className("button");
+
+    By giftCardInput = By.id("gc_number");
+    By promoCodeInput = By.id("promo_code");
+
+//    By addtoOrder = By.xpath("//*[@id='add_donation_cntonsel']/div[3]/div");
     By continueBtn2= By.xpath("//div[@class='button th_bt_next']");
     By homeButton = By.xpath("//*[@id='ps1444467860']");
 
@@ -116,30 +125,58 @@ public class TicketPurchase extends BrowserDriver {
         throw new RuntimeException("No visible ticket link found");
     }
 
+    @Override
+    public WebElement getQuantityInput() {
+        wait.until(ExpectedConditions.elementToBeClickable(donationAmt));
+        return driver.findElement(donationAmt);
+    }
+    public String getFieldValue()
+    {
+        wait.until(ExpectedConditions.elementToBeClickable(donationAmt));
+        WebElement element = driver.findElement(donationAmt);
+        return element.getAttribute("value");
 
+    }
 
-
-
-
-
-    public void submitCommands()
+    /** Navigate to the donation form and reveal its custom amount field. */
+    public void openDonationAmountField()
     {
         waitAndClick(acceptBtn);
         waitAndClick(acceptBtn2);
-        bypass(ticketSectionBtn);
-        bypass(OnedayTicket);
-        System.out.println("Before date step: " + driver.getTitle() + " " + driver.getCurrentUrl());
+        waitAndClick(ticketSectionBtn);
+        waitAndClick(OnedayTicket);
         switchWindows();
         clickDate();
         clickPlusButton(plusButton1, 0);
         clickPlusButton(plusButton2, 1);
-        clickPlusButton(plusButton3,5 );
+        clickPlusButton(plusButton3, 5);
         clickPlusButton(plusButton4, 9);
         clickPlusButton(plusButton5, 10);
         clickWait2(continueBtn);
         clickWait2(donationBox);
+        clickWait2(donationCustom);
+        wait.until(ExpectedConditions.elementToBeClickable(donationAmt));
+    }
+
+    public void submitCommands()
+    {
+        openDonationAmountField();
+        completeDonationAndCheckout();
+    }
+
+    public void completeDonationAndCheckout()
+    {
         clickWait2(donation10);
+
+        // Continue through the remaining donation options.
+        clickWait2(donation15);
+
         clickWait2(addtoOrder);
+
+        //Negative Testing
+        textInput(giftCardInput, "ABCDEFGH");
+        textInput(promoCodeInput, "1923812");
+
         clickWait2(continueBtn2);
         clickWait2(homeButton);
 
